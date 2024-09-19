@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'src/messages.g.dart'; // Import the generated Pigeon file
 
 void main() {
   runApp(DestinationApp());
@@ -20,24 +20,21 @@ class DestinationHomePage extends StatefulWidget {
   _DestinationHomePageState createState() => _DestinationHomePageState();
 }
 
-class _DestinationHomePageState extends State<DestinationHomePage> {
-  static const platform = MethodChannel('com.example.destination_app/deep_link');
-  String _receivedMessage = "https://via.placeholder.com/300/09f/fff.png";
+class _DestinationHomePageState extends State<DestinationHomePage>
+    implements DeepLinkApi {
+  String _imageUrl = "https://picsum.photos/200/300?grayscale";
 
   @override
   void initState() {
     super.initState();
-    _getDeepLinkMessage();
+
+    DeepLinkApi.setUp(this);
   }
 
-  Future<void> _getDeepLinkMessage() async {
-    platform.setMethodCallHandler((call) async {
-      if (call.method == "passMessage") {
-        final message = call.arguments as String;
-        setState(() {
-          _receivedMessage = message;
-        });
-      }
+  @override
+  void getMessage(String message) {
+    setState(() {
+      _imageUrl = message;
     });
   }
 
@@ -45,13 +42,10 @@ class _DestinationHomePageState extends State<DestinationHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Destination App"),
+        title: const Text("Destination App"),
       ),
       body: Center(
-        // child: Text(_receivedMessage),
-        child: Image.network(
-          _receivedMessage
-        ),
+        child: Image.network(_imageUrl),
       ),
     );
   }
